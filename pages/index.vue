@@ -125,7 +125,6 @@ export default {
         const customersCollection = collection(firestore, "customers");
         const querySnapshot = await getDocs(customersCollection);
 
-        // Mapeie os documentos da coleção para o array customers
         this.customers = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
