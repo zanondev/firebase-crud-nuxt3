@@ -28,20 +28,55 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="customer in customers" :key="customer.id">
+        <tr v-for="(customer, index) in customers" :key="customer.id">
           <td>{{ customer.email }}</td>
           <td>{{ customer.password }}</td>
           <td>
             <button @click="removeCustomer(customer.id)">Delete</button>
+            <button @click="editCustomer(index)">Edit</button>
           </td>
         </tr>
       </tbody>
     </table>
+
+    <form v-if="editIndex >= 0" @submit.prevent="updateCustomer">
+      <h2>Edit Customer</h2>
+      <div>
+        <label for="editEmail">Email:</label>
+        <input
+          type="email"
+          id="editEmail"
+          v-model="editCustomerData.email"
+          required
+        />
+      </div>
+      <div>
+        <label for="editPassword">Password:</label>
+        <input
+          type="password"
+          id="editPassword"
+          v-model="editCustomerData.password"
+          required
+        />
+      </div>
+      <div>
+        <button type="submit">Save</button>
+        <button @click="cancelEdit">Cancel</button>
+      </div>
+    </form>
   </div>
 </template>
 
 <script>
-import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc } from "firebase/firestore";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  doc,
+  deleteDoc,
+  updateDoc,
+} from "firebase/firestore";
 
 export default {
   data() {
@@ -51,6 +86,11 @@ export default {
         password: "",
       },
       customers: [],
+      editIndex: -1,
+      editCustomerData: {
+        email: "",
+        password: "",
+      },
     };
   },
   mounted() {
@@ -112,6 +152,47 @@ export default {
       } catch (error) {
         console.error("Error removing customer:", error);
       }
+    },
+
+    editCustomer(index) {
+      // Define o índice do cliente sendo editado
+      this.editIndex = index;
+      // Preenche os campos de edição com os valores atuais do cliente
+      this.editCustomerData.email = this.customers[index].email;
+      this.editCustomerData.password = this.customers[index].password;
+    },
+
+    async updateCustomer() {
+      try {
+        const firestore = getFirestore();
+        const customerRef = doc(
+          firestore,
+          "customers",
+          this.customers[this.editIndex].id
+        );
+
+        // Atualiza os valores do cliente com os novos valores
+        await updateDoc(customerRef, this.editCustomerData);
+
+        // Limpa os campos de edição e redefine o índice de edição
+        this.editCustomerData.email = "";
+        this.editCustomerData.password = "";
+        this.editIndex = -1;
+
+        // Recarrega a lista de clientes
+        await this.loadCustomers();
+
+        alert("Customer updated successfully!");
+      } catch (error) {
+        console.error("Error updating customer:", error);
+      }
+    },
+
+    cancelEdit() {
+      // Limpa os campos de edição e redefine o índice de edição
+      this.editCustomerData.email = "";
+      this.editCustomerData.password = "";
+      this.editIndex = -1;
     },
   },
 };
