@@ -19,7 +19,7 @@
       </div>
     </form>
 
-    <h2>Lista de Customers</h2>
+    <h2>Customers List</h2>
     <table>
       <thead>
         <tr>
