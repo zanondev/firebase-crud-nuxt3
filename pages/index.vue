@@ -94,7 +94,7 @@ export default {
     };
   },
   mounted() {
-    this.loadCustomers(); // Carregue os customers quando o componente for montado
+    this.loadCustomers(); 
   },
   methods: {
     async saveCustomer() {
@@ -106,10 +106,8 @@ export default {
           password: this.customer.password,
         };
 
-        // Add the new customer to the "customers" collection
         await addDoc(collection(firestore, "customers"), customerData);
 
-        // Clear the fields after saving
         this.customer.email = "";
         this.customer.password = "";
 
@@ -142,10 +140,8 @@ export default {
         const firestore = getFirestore();
         const customerRef = doc(firestore, "customers", customerId);
 
-        // Exclua o cliente com base no ID
         await deleteDoc(customerRef);
 
-        // Recarregue a lista após a remoção
         await this.loadCustomers();
 
         alert("Customer removed successfully!");
@@ -155,9 +151,8 @@ export default {
     },
 
     editCustomer(index) {
-      // Define o índice do cliente sendo editado
       this.editIndex = index;
-      // Preenche os campos de edição com os valores atuais do cliente
+
       this.editCustomerData.email = this.customers[index].email;
       this.editCustomerData.password = this.customers[index].password;
     },
@@ -171,15 +166,12 @@ export default {
           this.customers[this.editIndex].id
         );
 
-        // Atualiza os valores do cliente com os novos valores
         await updateDoc(customerRef, this.editCustomerData);
 
-        // Limpa os campos de edição e redefine o índice de edição
         this.editCustomerData.email = "";
         this.editCustomerData.password = "";
         this.editIndex = -1;
 
-        // Recarrega a lista de clientes
         await this.loadCustomers();
 
         alert("Customer updated successfully!");
@@ -189,7 +181,6 @@ export default {
     },
 
     cancelEdit() {
-      // Limpa os campos de edição e redefine o índice de edição
       this.editCustomerData.email = "";
       this.editCustomerData.password = "";
       this.editIndex = -1;
